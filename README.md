@@ -75,6 +75,39 @@ org-{organizationId}/practice-{practiceId}/item-{practiceItemId}/{documentId}-{s
 
 The bucket must remain private. Studio downloads use signed URLs generated server-side.
 
+
+## Local End-to-End Setup
+
+```bash
+supabase start
+supabase db reset
+npm install
+npm run seed:dev
+npm run dev
+```
+
+`npm run seed:dev` prints:
+
+- `organization_id`
+- `client_id`
+- `practice_id`
+- `public_token`
+- `studio_practice_url`
+- `public_portal_url`
+
+Then open `/dashboard`, the printed studio practice URL, and the printed public portal URL.
+
+## Integration QA
+
+```bash
+npm run test:integration
+```
+
+The integration suite expects local Supabase to be running and `.env.local` to contain the local Supabase URL and service role key. It covers seed/template creation, public token behavior, storage upload, document records, signed URLs, and tenant-scoped queries.
+
+Manual browser smoke steps are in `docs/QA_SMOKE_TEST.md`.
+Security checks are in `docs/SECURITY_CHECKLIST.md`.
+
 ## Tests
 
 ```bash
