@@ -1,0 +1,3 @@
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+export default function HomePage() { return <main className="mx-auto flex min-h-screen max-w-4xl flex-col justify-center px-6"><h1 className="text-4xl font-semibold">ClientVault 730</h1><p className="mt-4 max-w-2xl text-muted-foreground">Portale operativo per studi che raccolgono, verificano e archiviano documenti 730.</p><div className="mt-8 flex gap-3"><Button asChild><Link href="/dashboard">Apri dashboard</Link></Button><Button asChild variant="secondary"><Link href="/clients">Clienti</Link></Button></div></main>; }

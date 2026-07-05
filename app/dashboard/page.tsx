@@ -1,0 +1,9 @@
+import Link from "next/link";
+import { AppShell } from "@/components/layout/app-shell";
+import { PracticeTable } from "@/components/studio/practice-table";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { getCurrentOrganization } from "@/lib/studio/organization-context";
+import { getStudioRepository } from "@/lib/studio/repository";
+export const dynamic = "force-dynamic";
+export default async function DashboardPage() { const org = await getCurrentOrganization(); const repo = getStudioRepository(); await repo.ensureDefault730Template(); const dashboard = await repo.getDashboard(org.id); const metrics = [{ label: "Pratiche totali", value: dashboard.totalPractices }, { label: "In lavorazione", value: dashboard.inProgress }, { label: "Da verificare", value: dashboard.needsReview }, { label: "Complete", value: dashboard.complete }, { label: "Documenti mancanti", value: dashboard.totalMissingDocuments }]; return <AppShell><div className="mb-8 flex flex-wrap items-start justify-between gap-4"><div><p className="text-sm font-medium text-muted-foreground">{org.name}</p><h1 className="mt-2 text-3xl font-semibold">Dashboard studio</h1></div><Button asChild><Link href="/practices/new">Nuova pratica 730</Link></Button></div><section className="grid gap-4 md:grid-cols-5">{metrics.map((m) => <Card key={m.label}><CardHeader className="pb-2"><CardTitle className="text-sm font-medium text-muted-foreground">{m.label}</CardTitle></CardHeader><CardContent><p className="text-3xl font-semibold">{m.value}</p></CardContent></Card>)}</section><section className="mt-10"><h2 className="mb-4 text-xl font-semibold">Pratiche recenti</h2><PracticeTable practices={dashboard.recentPractices} /></section></AppShell>; }

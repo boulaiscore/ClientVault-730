@@ -1,0 +1,11 @@
+import Link from "next/link";
+import type { Route } from "next";
+import { AppShell } from "@/components/layout/app-shell";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { getCurrentOrganization } from "@/lib/studio/organization-context";
+import { getStudioRepository } from "@/lib/studio/repository";
+import { getClientDisplayName } from "@/types/models";
+export const dynamic = "force-dynamic";
+export default async function ClientsPage({ searchParams }: { searchParams?: Promise<{ q?: string }> }) { const params = await searchParams; const org = await getCurrentOrganization(); const clients = await getStudioRepository().listClients(org.id, params?.q); return <AppShell><div className="mb-8 flex justify-between gap-4"><div><p className="text-sm font-medium text-muted-foreground">Clienti</p><h1 className="mt-2 text-3xl font-semibold">Anagrafica clienti</h1></div><Button asChild><Link href="/clients/new">Nuovo cliente</Link></Button></div><form className="mb-6 max-w-lg"><Input name="q" placeholder="Cerca per nome, email, telefono o codice fiscale" defaultValue={params?.q ?? ""} /></form><Card className="overflow-hidden"><table className="w-full border-collapse text-sm"><thead className="bg-muted/60 text-left text-muted-foreground"><tr><th className="px-4 py-3 font-medium">Cliente</th><th className="px-4 py-3 font-medium">Email</th><th className="px-4 py-3 font-medium">Telefono</th><th className="px-4 py-3 font-medium">Stato</th><th className="px-4 py-3" /></tr></thead><tbody>{clients.map((client) => <tr key={client.id} className="border-t border-border"><td className="px-4 py-3 font-medium">{getClientDisplayName(client)}</td><td className="px-4 py-3">{client.email ?? "-"}</td><td className="px-4 py-3">{client.phone ?? "-"}</td><td className="px-4 py-3">{client.status}</td><td className="px-4 py-3 text-right"><Button asChild variant="secondary"><Link href={`/clients/${client.id}` as Route}>Apri</Link></Button></td></tr>)}{clients.length === 0 ? <tr><td className="px-4 py-8 text-center text-muted-foreground" colSpan={5}>Nessun cliente trovato.</td></tr> : null}</tbody></table></Card></AppShell>; }
