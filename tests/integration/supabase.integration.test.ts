@@ -173,6 +173,66 @@ describeIntegration("local Supabase integration", () => {
     expect(item!.practice_id).not.toBe(otherPractice!.id);
   });
 
+
+  it("records correction reminder workflow in persisted tables", async () => {
+    const { data: item, error: itemError } = await ctx.supabase
+      .from("practice_items")
+      .select()
+      .eq("practice_id", ctx.practice_id)
+      .order("sort_order", { ascending: true })
+      .limit(1)
+      .single();
+    expect(itemError).toBeNull();
+
+    const note = "Documento illeggibile, caricare una nuova scansione.";
+    const correction = await ctx.supabase
+      .from("practice_items")
+      .update({ status: "needs_correction", note_to_client: note })
+      .eq("organization_id", ctx.organization_id)
+      .eq("id", item!.id);
+    expect(correction.error).toBeNull();
+
+    const activity = await ctx.supabase.from("activity_log_events").insert({
+      organization_id: ctx.organization_id,
+      practice_id: ctx.practice_id,
+      practice_item_id: item!.id,
+      event_type: "item_marked_needs_correction",
+      actor_type: "studio",
+      metadata: { noteToClient: note }
+    });
+    expect(activity.error).toBeNull();
+
+    const sentAt = new Date().toISOString();
+    const { data: reminder, error: reminderError } = await ctx.supabase
+      .from("reminders")
+      .insert({ organization_id: ctx.organization_id, practice_id: ctx.practice_id, channel: "email", reminder_type: "correction", target_item_id: item!.id, status: "sent", sent_at: sentAt, payload: { note } })
+      .select()
+      .single();
+    expect(reminderError).toBeNull();
+
+    const reminderActivity = await ctx.supabase.from("activity_log_events").insert({
+      organization_id: ctx.organization_id,
+      practice_id: ctx.practice_id,
+      practice_item_id: item!.id,
+      event_type: "correction_notification_sent",
+      actor_type: "studio",
+      metadata: { reminderId: reminder!.id }
+    });
+    expect(reminderActivity.error).toBeNull();
+
+    const practiceUpdate = await ctx.supabase.from("practices").update({ last_reminder_sent_at: sentAt, reminder_count: 1 }).eq("id", ctx.practice_id);
+    expect(practiceUpdate.error).toBeNull();
+
+    const { data: reloadedReminder, error: reloadError } = await ctx.supabase.from("reminders").select().eq("id", reminder!.id).single();
+    expect(reloadError).toBeNull();
+    expect(reloadedReminder!.status).toBe("sent");
+    expect(reloadedReminder!.target_item_id).toBe(item!.id);
+
+    const { data: reloadedPractice } = await ctx.supabase.from("practices").select("last_reminder_sent_at,reminder_count").eq("id", ctx.practice_id).single();
+    expect(new Date(reloadedPractice!.last_reminder_sent_at!).getTime()).toBe(new Date(sentAt).getTime());
+    expect(reloadedPractice!.reminder_count).toBe(1);
+  });
+
   it("tenant isolation holds in scoped repository-style queries", async () => {
     const otherOrgId = crypto.randomUUID();
     const { data: userList } = await ctx.supabase.auth.admin.listUsers({ page: 1, perPage: 1 });

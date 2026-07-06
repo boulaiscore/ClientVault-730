@@ -15,3 +15,10 @@
 - The public portal never lists files from the bucket.
 - Repository methods scope tenant data by `organization_id`.
 - The storage path includes organization, practice, item, and document ids for traceability.
+
+## Email Reminders
+
+- `RESEND_API_KEY` is server-only and must never use a `NEXT_PUBLIC_` prefix.
+- Local development should use `EMAIL_PROVIDER=console` unless intentionally testing Resend.
+- Reminder emails include only missing/correction item labels and the tokenized portal URL; they must not expose `organization_id`.
+- Failed email attempts are recorded in `reminders` without leaking provider secrets into payloads or activity logs.

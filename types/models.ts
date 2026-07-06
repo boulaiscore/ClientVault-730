@@ -76,6 +76,9 @@ export type Practice = Timestamped & {
   publicToken: string;
   publicLinkEnabled: boolean;
   archivedAt: string | null;
+  reminderEnabled: boolean;
+  lastReminderSentAt: string | null;
+  reminderCount: number;
 };
 
 export type PracticeItem = Timestamped & {
@@ -88,6 +91,7 @@ export type PracticeItem = Timestamped & {
   required: boolean;
   status: PracticeItemStatus;
   note: string | null;
+  noteToClient: string | null;
   sortOrder: number;
 };
 
@@ -128,9 +132,33 @@ export type ActivityEventType =
   | "document_uploaded"
   | "document_deleted"
   | "public_link_disabled"
-  | "public_link_enabled";
+  | "public_link_enabled"
+  | "reminder_sent"
+  | "reminder_failed"
+  | "correction_notification_sent"
+  | "correction_notification_failed"
+  | "item_marked_needs_correction"
+  | "item_approved"
+  | "item_marked_not_needed";
 
 export type ActivityActorType = "client" | "studio" | "system";
+
+export type ReminderChannel = "email";
+export type ReminderType = "missing_documents" | "correction";
+export type ReminderStatus = "sent" | "failed";
+
+export type ReminderRecord = Timestamped & {
+  id: ID;
+  organizationId: ID;
+  practiceId: ID;
+  channel: ReminderChannel;
+  reminderType: ReminderType;
+  targetItemId: ID | null;
+  status: ReminderStatus;
+  sentAt: string;
+  payload: Record<string, unknown>;
+  errorMessage: string | null;
+};
 
 export type ActivityLogEvent = Timestamped & {
   id: ID;

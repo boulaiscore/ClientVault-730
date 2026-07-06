@@ -29,6 +29,9 @@ export function createPracticeFromTemplate(input: CreatePracticeInput) {
     publicToken: input.createPublicToken?.() ?? input.createId(),
     publicLinkEnabled: true,
     archivedAt: null,
+    reminderEnabled: true,
+    lastReminderSentAt: null,
+    reminderCount: 0,
     createdAt: timestamp,
     updatedAt: timestamp
   };
@@ -48,6 +51,7 @@ export function createPracticeFromTemplate(input: CreatePracticeInput) {
       required: templateItem.required,
       status: "requested",
       note: null,
+      noteToClient: null,
       sortOrder: index + 1,
       createdAt: timestamp,
       updatedAt: timestamp

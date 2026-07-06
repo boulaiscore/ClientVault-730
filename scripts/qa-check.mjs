@@ -12,7 +12,8 @@ const REQUIRED_TABLES = [
   "practice_items",
   "client_requests",
   "document_records",
-  "activity_log_events"
+  "activity_log_events",
+  "reminders"
 ];
 
 function assert(condition, message) {

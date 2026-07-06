@@ -103,13 +103,39 @@ npm run dev
 
 Then open `/dashboard`, the printed studio practice URL, and the printed public portal URL.
 
+## Email Reminders
+
+Local development defaults to the console email provider:
+
+```bash
+EMAIL_PROVIDER=console
+EMAIL_FROM="ClientVault 730 <no-reply@clientvault.local>"
+APP_BASE_URL=http://localhost:3000
+```
+
+To use Resend server-side, set:
+
+```bash
+EMAIL_PROVIDER=resend
+RESEND_API_KEY=...
+EMAIL_FROM="Studio <730@yourdomain.it>"
+```
+
+Manual due reminders can be run with:
+
+```bash
+npm run reminders:send-due
+```
+
+The simple due job sends one missing-document email for practices with public link enabled, status `sent`, `in_progress`, or `needs_review`, at least one `requested` or `needs_correction` item, and no reminder in the last 3 days by default. Cron hosting is intentionally not included yet; an external scheduler can call this script later.
+
 ## Integration QA
 
 ```bash
 npm run test:integration
 ```
 
-The integration suite expects local Supabase to be running and `.env.local` to contain the local Supabase URL and service role key. It covers seed/template creation, public token behavior, storage upload, document records, signed URLs, and tenant-scoped queries.
+The integration suite expects local Supabase to be running and `.env.local` to contain the local Supabase URL and service role key. It covers seed/template creation, public token behavior, storage upload, document records, signed URLs, reminder records/activity logs, and tenant-scoped queries.
 
 Manual browser smoke steps are in `docs/QA_SMOKE_TEST.md`.
 Security checks are in `docs/SECURITY_CHECKLIST.md`.
@@ -126,7 +152,6 @@ npm test
 
 ## Not Implemented
 
-- Email reminders
 - Stripe billing
 - AI/OCR
 - WhatsApp API
