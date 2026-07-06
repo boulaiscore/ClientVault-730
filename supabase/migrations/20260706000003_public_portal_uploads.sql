@@ -1,0 +1,1 @@
+-- Public portal uploads are included in database/schema.sql for fresh installs.

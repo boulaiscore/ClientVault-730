@@ -6,8 +6,7 @@ import { ensureDevSeed } from "../../scripts/lib/dev-seed.mjs";
 
 loadLocalEnv(process.cwd());
 const shouldRun = process.env.RUN_INTEGRATION_TESTS === "true";
-const hasSupabaseEnv = Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY);
-const describeIntegration = shouldRun && hasSupabaseEnv ? describe : describe.skip;
+const describeIntegration = shouldRun ? describe : describe.skip;
 
 type SeedContext = Awaited<ReturnType<typeof ensureDevSeed>>;
 

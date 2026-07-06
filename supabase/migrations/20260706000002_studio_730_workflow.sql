@@ -1,0 +1,1 @@
+-- Studio 730 workflow is included in database/schema.sql for fresh installs.

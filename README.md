@@ -40,26 +40,30 @@ Open `http://localhost:3000`.
 
 ## Database
 
-The full schema is in `database/schema.sql`.
+The full schema snapshot is in `database/schema.sql`.
 
-Migrations:
+Canonical Supabase CLI migrations live in `supabase/migrations`. `supabase db reset` applies these files from a clean local database, including the private `client-documents` storage bucket.
 
-- `database/migrations/0001_initial_schema.sql`
-- `database/migrations/0002_studio_730_workflow.sql`
-- `database/migrations/0003_public_portal_uploads.sql`
+The `database/migrations` folder is kept as an app-schema mirror/reference for readers and non-Supabase Postgres installs. Do not rely on it for Supabase CLI resets.
 
 Local Supabase setup:
 
 ```bash
 supabase start
 supabase db reset
+npm run seed:dev
+npm run qa:check
+npm run test:integration
+npm run dev
 ```
 
-Until auth is wired, set `CLIENTVAULT_DEV_ORGANIZATION_ID` to an existing organization id.
+`.env.local` can be copied from `.env.example`. If local Supabase is already running, the dev scripts can also read local URL and keys from `supabase status -o env`.
+
+The app intentionally uses `public.profiles` as the studio user profile table, linked to `auth.users`. There is no separate `public.users` table.
 
 ## Private Storage
 
-Create a private Supabase Storage bucket matching `CLIENTVAULT_STORAGE_BUCKET`:
+The private Supabase Storage bucket is created by `supabase/migrations/20260706000004_private_storage_bucket.sql`:
 
 ```sql
 insert into storage.buckets (id, name, public)
@@ -83,6 +87,8 @@ supabase start
 supabase db reset
 npm install
 npm run seed:dev
+npm run qa:check
+npm run test:integration
 npm run dev
 ```
 
@@ -111,6 +117,8 @@ Security checks are in `docs/SECURITY_CHECKLIST.md`.
 ## Tests
 
 ```bash
+npm run qa:check
+npm run test:integration
 npm run typecheck
 npm run build
 npm test
